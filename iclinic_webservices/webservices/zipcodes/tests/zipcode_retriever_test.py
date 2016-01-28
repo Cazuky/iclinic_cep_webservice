@@ -2,6 +2,7 @@ from django.test import TestCase
 from iclinic_webservices.webservices.zipcodes.retriever import ZipCodeRetriever
 from iclinic_webservices.webservices.zipcodes.exceptions import InvalidZipCodeFormatException, PostmonZipCodeNotFound
 
+
 class ZipCodeRetrieverTestCase(TestCase):
 
     def setUp(self):
@@ -13,7 +14,7 @@ class ZipCodeRetrieverTestCase(TestCase):
         zip_code = self.zip_code_invalid
 
         with self.assertRaises(InvalidZipCodeFormatException):
-            retriever = ZipCodeRetriever(zip_code)
+            ZipCodeRetriever(zip_code)
 
     def test_zip_code_not_found(self):
         zip_code = self.zip_code_inexistent
@@ -29,5 +30,3 @@ class ZipCodeRetrieverTestCase(TestCase):
 
         self.assertIsInstance(result, dict)
         self.assertIn('cep', result.keys())
-
-

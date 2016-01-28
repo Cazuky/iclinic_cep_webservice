@@ -47,8 +47,7 @@ class ZipCodeRetriever(object):
         return response.status_code, response.text
 
     def validate_zip_code_format(self, zip_code):
-        match = re.match(r'^\d{5}\-\d{3}$', zip_code)
+        match = re.match(r'^\d{5}\-{0,1}\d{3}$', zip_code)
         if match:
             return True
         return False
-
