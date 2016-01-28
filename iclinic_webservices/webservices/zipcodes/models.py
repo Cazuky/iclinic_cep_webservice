@@ -16,7 +16,7 @@ class ZipCode(Base):
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=2)
     address = models.CharField(max_length=255)
-    zip_code = models.CharField(max_length=8)
+    zip_code = models.CharField(max_length=8, unique=True)
     neighborhood = models.CharField(max_length=255)
 
 
@@ -27,4 +27,3 @@ class ZipCode(Base):
 
     def __unicode__(self):
         return self.zip_code
-
