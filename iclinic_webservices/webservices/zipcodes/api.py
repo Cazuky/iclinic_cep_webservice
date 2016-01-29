@@ -74,3 +74,12 @@ class ZipCodeResource(DjangoResource):
 
         return zip_code_object
 
+    def delete(self, pk):
+        zip_code = pk
+
+        try:
+            zip_code_object = ZipCode.objects.get(zip_code=zip_code)
+        except ZipCode.DoesNotExist:
+            raise NotFound("Zipcode %s not found in the database." % zip_code)
+
+        zip_code_object.delete()

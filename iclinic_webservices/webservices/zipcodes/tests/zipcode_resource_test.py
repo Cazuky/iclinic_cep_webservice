@@ -2,6 +2,8 @@ from django.test import TestCase, Client
 
 from .factories import ZipCodeFactory, ApiKeyFactory
 
+from iclinic_webservices.webservices.zipcodes.models import ZipCode
+
 
 class ZipCodeResourceTestCase(TestCase):
 
@@ -18,6 +20,16 @@ class ZipCodeResourceTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, expected)
+
+
+    def teste_delete(self):
+        zip_code = ZipCodeFactory.create()
+        url = self.url_with_zip_code % {'zip_code': zip_code.zip_code,
+                                        'api_key': self.api_key}
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 204)
 
     def test_detail(self):
         zip_code = ZipCodeFactory.create()
