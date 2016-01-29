@@ -13,6 +13,5 @@ class ApiKey(models.Model):
     class Meta:
         db_table = 'api_keys'
 
-
     def __unicode__(self):
         return self.key

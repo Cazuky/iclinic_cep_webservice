@@ -49,3 +49,11 @@ class ZipCodeResourceTestCase(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_delete_not_found(self):
+        zip_code = '00000000'
+        url = self.url_with_zip_code % {'zip_code': zip_code,
+                                        'api_key': self.api_key}
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 404)
+
