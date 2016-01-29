@@ -37,3 +37,10 @@ class ZipCode(models.Model):
         ])
 
         return json.dumps(zip_code)
+
+    def save(self, *args, **kwargs):
+        self.clean_zip_code()
+        super(ZipCode, self).save(*args, **kwargs)
+
+    def clean_zip_code(self):
+        self.zip_code = self.zip_code.replace('-', '')
