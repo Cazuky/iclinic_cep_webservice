@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
+import json
 
 from django.db import models
+
+from collections import OrderedDict
 
 
 class ZipCode(models.Model):
@@ -20,3 +23,17 @@ class ZipCode(models.Model):
 
     def __unicode__(self):
         return self.zip_code
+
+    def jsonify(self):
+        # fields are this ordered because restless can't
+        # keep fields in the order the were defined
+        zip_code = OrderedDict([
+            ('city', self.city),
+            ('neighborhood', self.neighborhood),
+            ('state', self.state),
+            ('address', self.address),
+            ('id', self.pk),
+            ('zip_code', self.zip_code)
+        ])
+
+        return json.dumps(zip_code)
