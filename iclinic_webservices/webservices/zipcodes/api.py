@@ -1,6 +1,6 @@
 from restless.dj import DjangoResource
 from restless.preparers import FieldsPreparer
-from restless.exceptions import BadRequest
+from restless.exceptions import BadRequest, NotFound
 
 from django.db import IntegrityError
 from django.conf import settings
@@ -61,6 +61,16 @@ class ZipCodeResource(DjangoResource):
             zip_code_object = ZipCode.objects.create(**zip_code_data)
         except IntegrityError:
             raise BadRequest("Zipcode %s is already in the database." % zip_code)
+
+        return zip_code_object
+
+    def detail(self, pk):
+        zip_code = pk
+
+        try:
+            zip_code_object = ZipCode.objects.get(zip_code=zip_code)
+        except ZipCode.DoesNotExist:
+            raise NotFound("Zipcode %s not found in the database." % zip_code)
 
         return zip_code_object
 
