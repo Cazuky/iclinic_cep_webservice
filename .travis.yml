@@ -6,7 +6,7 @@ env:
   - DJANGO_VERSION=1.9.1
 install:
   - pip install -q Django==$DJANGO_VERSION
-  - pip install -r requirements/development.txt
+  - pip install -r requirements/development.txt --use-mirrors
   - pip install pep8 --use-mirrors
   - pip install https://github.com/dcramer/pyflakes/tarball/master
 before_script:
