@@ -10,7 +10,7 @@ class ZipCodeResource(DjangoResource):
         'id': 'id',
         'city': 'city',
         'state': 'state',
-        'addreess': 'address',
+        'address': 'address',
         'zip_code': 'zip_code',
         'neighborhood': 'neighborhood'
     })
