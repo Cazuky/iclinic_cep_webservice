@@ -117,13 +117,6 @@ This endpoint deletes a zipcode.
 $ curl -X DELETE http://localhost:8000/zipcodes/14800360?api_key=d41d8cd98f00b204e9800998ecf8427e
 ```
 
-##### Response Example
-```bash
-{
-    "deleted": true
-}
-```
-
 # Tests
 ```bash
 python manage.py --pattern=*_test.py
