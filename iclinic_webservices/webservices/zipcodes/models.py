@@ -10,9 +10,9 @@ class ZipCode(models.Model):
 
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=2)
-    address = models.CharField(max_length=255)
+    address = models.CharField(max_length=255, null=True)
     zip_code = models.CharField(max_length=9, unique=True)
-    neighborhood = models.CharField(max_length=255)
+    neighborhood = models.CharField(max_length=255, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
