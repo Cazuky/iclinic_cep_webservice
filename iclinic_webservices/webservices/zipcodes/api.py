@@ -1,9 +1,15 @@
 from restless.dj import DjangoResource
 from restless.preparers import FieldsPreparer
+from restless.exceptions import BadRequest
+
+from django.db import IntegrityError
 from django.conf import settings
 
 from iclinic_webservices.webservices.zipcodes.models import ZipCode
 from iclinic_webservices.webservices.apikeys.models import ApiKey
+from iclinic_webservices.webservices.zipcodes.retriever import ZipCodeRetriever
+
+from iclinic_webservices.webservices.zipcodes.exceptions import InvalidZipCodeFormatException, PostmonZipCodeNotFound
 
 
 class ZipCodeResource(DjangoResource):
@@ -31,4 +37,30 @@ class ZipCodeResource(DjangoResource):
 
     def list(self):
         return ZipCode.objects.all()
+
+    def create(self):
+        zip_code = self.data.get('zip_code')
+
+        try:
+            retriever = ZipCodeRetriever(zip_code)
+            data = retriever.fetch()
+        except InvalidZipCodeFormatException:
+            raise BadRequest("Invalid %s zip code format." % zip_code)
+        except PostmonZipCodeNotFound:
+            raise BadRequest("Zipcode %s not found in Postmon." % zip_code)
+
+        zip_code_data = {
+            'city': data.get('cidade'),
+            'state': data.get('estado'),
+            'zip_code': data.get('cep'),
+            'address': data.get('logradouro'),
+            'neighborhood': data.get('bairro')
+        }
+
+        try:
+            zip_code_object = ZipCode.objects.create(**zip_code_data)
+        except IntegrityError:
+            raise BadRequest("Zipcode %s is already in the database." % zip_code)
+
+        return zip_code_object
 
