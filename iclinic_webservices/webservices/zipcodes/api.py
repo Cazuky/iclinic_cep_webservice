@@ -1,3 +1,5 @@
+import logging
+
 from restless.dj import DjangoResource
 from restless.preparers import FieldsPreparer
 from restless.exceptions import BadRequest, NotFound
@@ -10,6 +12,9 @@ from iclinic_webservices.webservices.apikeys.models import ApiKey
 from iclinic_webservices.webservices.zipcodes.retriever import ZipCodeRetriever
 
 from iclinic_webservices.webservices.zipcodes.exceptions import InvalidZipCodeFormatException, PostmonZipCodeNotFound
+
+
+logger = logging.getLogger(__name__)
 
 
 class ZipCodeResource(DjangoResource):
@@ -36,18 +41,28 @@ class ZipCodeResource(DjangoResource):
             return False
 
     def list(self):
+        logger.info('[API LIST] List zipcodes')
         return ZipCode.objects.all()
 
     def create(self):
+        logger.info('[API CREATE] Create zipcode. zip_code=%s' % self.data.get('zip_code'))
         zip_code = self.data.get('zip_code')
 
         try:
             retriever = ZipCodeRetriever(zip_code)
             data = retriever.fetch()
+            logger.info('[API CREATE] Create zipcode. zip_code=%s data=%s' % (zip_code, data))
         except InvalidZipCodeFormatException:
-            raise BadRequest("Invalid %s zip code format." % zip_code)
+            error = "Invalid %s zip code format." % zip_code
+            logger.error('[API CREATE] Error on create zipcode. zip_code=%s error=%s' % (zip_code, error))
+
+            raise BadRequest(error)
+
         except PostmonZipCodeNotFound:
-            raise BadRequest("Zipcode %s not found in Postmon." % zip_code)
+            error = "Zipcode %s not found in Postmon." % zip_code
+            logger.error('[API CREATE] Error on create zipcode. zip_code=%s error=%s' % (zip_code, error))
+
+            raise BadRequest(error)
 
         zip_code_data = {
             'city': data.get('cidade'),
@@ -59,25 +74,36 @@ class ZipCodeResource(DjangoResource):
 
         try:
             zip_code_object = ZipCode.objects.create(**zip_code_data)
-        except IntegrityError:
-            raise BadRequest("Zipcode %s is already in the database." % zip_code)
+        except IntegrityError as e:
+            error_code, error_message = e
+            logger.error('[API CREATE] Error on create zipcode. zip_code=%s error=%s' % (zip_code, error_message))
+
+            raise BadRequest(error)
+
+        logger.info('[API CREATE] Zipcode created. zip_code=%s' % zip_code)
 
         return zip_code_object
 
     def detail(self, zip_code):
-
+        logger.info('[API DETAIL] Get zipcode details. zip_code=%s' % zip_code)
         try:
             zip_code_object = ZipCode.objects.get(zip_code=zip_code)
         except ZipCode.DoesNotExist:
-            raise NotFound("Zipcode %s not found in the database." % zip_code)
+            error = "Zipcode %s not found in the database." % zip_code
+            logger.info("[API DETAIL] Error on getting zipcode details. zip_code=%s error=%s" % (zip_code, error))
+
+            raise NotFound(error)
 
         return zip_code_object
 
     def delete(self, zip_code):
-
+        logger.info('[API DELETE] Delete zipcode. zip_code=%s' % zip_code)
         try:
             zip_code_object = ZipCode.objects.get(zip_code=zip_code)
         except ZipCode.DoesNotExist:
-            raise NotFound("Zipcode %s not found in the database." % zip_code)
+            error = "Zipcode %s not found in the database." % zip_code
+            logger.info("[API DELETE] Error on deleting zipcode details. zip_code=%s error=%s" % (zip_code, error))
+
+            raise NotFound(error)
 
         zip_code_object.delete()

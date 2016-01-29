@@ -3,8 +3,12 @@ from .exceptions import InvalidZipCodeFormatException, PostmonZipCodeNotFound
 from django.conf import settings
 
 import requests
+import logging
 import json
 import re
+
+
+logger = logging.getLogger(__name__)
 
 
 class ZipCodeRetriever(object):
@@ -35,14 +39,19 @@ class ZipCodeRetriever(object):
                u'nome': u'S\xe3o Paulo'},
           u'logradouro': u'Avenida Presidente Vargas'})
         """
+        logger.info('[POSTMON] Fecthing zipcode information. zip_code=%s' % self.zip_code)
         url = settings.POSTMON_API_URL % {'cep': self.zip_code}
         response = requests.get(url)
 
         if response.status_code == 404:
+            logger.info('[POSTMON] Zipcode not found. zip_code=%s' % self.zip_code)
             raise PostmonZipCodeNotFound
 
         if response.status_code == 200:
+            logger.info('[POSTMON] Zipcode found. zip_code=%s' % self.zip_code)
             return json.loads(response.text)
+
+        logger.info('[POSTMON] Fetched zipcode information. zip_code=%s status_code=%s response=%s' % (self.zip_code, response.status_code, response.text))
 
         return response.status_code, response.text
 
