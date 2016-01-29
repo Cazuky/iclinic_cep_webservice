@@ -28,7 +28,7 @@ class ZipCodeResource(DjangoResource):
     })
 
     def is_debug(self):
-        return True
+        return settings.DEBUG
 
     def is_authenticated(self):
         try:
