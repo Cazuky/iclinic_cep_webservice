@@ -21,7 +21,6 @@ class ZipCodeResourceTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, expected)
 
-
     def teste_delete(self):
         zip_code = ZipCodeFactory.create()
         url = self.url_with_zip_code % {'zip_code': zip_code.zip_code,
@@ -40,7 +39,6 @@ class ZipCodeResourceTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(response.content, zip_code.jsonify())
 
-
     def test_detail_not_found(self):
         zip_code = '00000000'
         url = self.url_with_zip_code % {'zip_code': zip_code,
@@ -56,4 +54,3 @@ class ZipCodeResourceTestCase(TestCase):
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, 404)
-
