@@ -39,3 +39,13 @@ class ZipCodeResourceTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(response.content, zip_code.jsonify())
+
+
+    def test_detail_not_found(self):
+        zip_code = '00000000'
+        url = self.url_with_zip_code % {'zip_code': zip_code,
+                                        'api_key': self.api_key}
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
