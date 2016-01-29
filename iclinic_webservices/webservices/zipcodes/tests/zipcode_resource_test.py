@@ -1,8 +1,9 @@
 from django.test import TestCase, Client
 
 from .factories import ZipCodeFactory, ApiKeyFactory
-
 from iclinic_webservices.webservices.zipcodes.models import ZipCode
+
+import json
 
 
 class ZipCodeResourceTestCase(TestCase):
@@ -11,7 +12,8 @@ class ZipCodeResourceTestCase(TestCase):
         self.client = Client()
         self.api_key = ApiKeyFactory.create()
         self.url = "/zipcodes/?api_key=%s" % self.api_key
-        self.url_with_zip_code = "/zipcodes/%(zip_code)s/?api_key=%(api_key)s"
+        self.url_with_zipcode = "/zipcodes/%(zip_code)s/?api_key=%(api_key)s"
+        self.fake_zipcode = '000-12345'
 
     def test_list(self):
         zip_code = ZipCodeFactory.create()
@@ -21,10 +23,23 @@ class ZipCodeResourceTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, expected)
 
+    def test_create(self):
+        zip_code_json = json.dumps({"zip_code": "14020260"})
+        response = self.client.post(self.url,
+                                    zip_code_json,
+                                    content_type="application/json")
+
+        self.assertEqual(response.status_code, 201)
+
+        zip_code = ZipCode.objects.get(zip_code="14020260")
+        expected = zip_code.jsonify()
+
+        self.assertJSONEqual(response.content, expected)
+
     def teste_delete(self):
         zip_code = ZipCodeFactory.create()
-        url = self.url_with_zip_code % {'zip_code': zip_code.zip_code,
-                                        'api_key': self.api_key}
+        url = self.url_with_zipcode % {'zip_code': zip_code.zip_code,
+                                       'api_key': self.api_key}
 
         response = self.client.delete(url)
 
@@ -32,25 +47,61 @@ class ZipCodeResourceTestCase(TestCase):
 
     def test_detail(self):
         zip_code = ZipCodeFactory.create()
-        url = self.url_with_zip_code % {'zip_code': zip_code.zip_code,
-                                        'api_key': self.api_key}
+        url = self.url_with_zipcode % {'zip_code': zip_code.zip_code,
+                                       'api_key': self.api_key}
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(response.content, zip_code.jsonify())
 
+    def test_create_zipcode_duplicated(self):
+        zip_code_json = json.dumps({"zip_code": "14800360"})
+
+        # create zipcode successfullly
+        response = self.client.post(self.url, zip_code_json,
+                                    content_type="application/json")
+
+        self.assertEqual(response.status_code, 201)
+
+        # fails to create because already exists
+        response = self.client.post(self.url, zip_code_json,
+                                    content_type="application/json")
+
+        self.assertEqual(response.status_code, 400)
+
     def test_detail_not_found(self):
         zip_code = '00000000'
-        url = self.url_with_zip_code % {'zip_code': zip_code,
-                                        'api_key': self.api_key}
+        url = self.url_with_zipcode % {'zip_code': zip_code,
+                                       'api_key': self.api_key}
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 404)
 
     def test_delete_not_found(self):
         zip_code = '00000000'
-        url = self.url_with_zip_code % {'zip_code': zip_code,
-                                        'api_key': self.api_key}
+        url = self.url_with_zipcode % {'zip_code': zip_code,
+                                       'api_key': self.api_key}
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, 404)
+
+    def test_create_zipcode_invalid_format(self):
+        zip_code_json = json.dumps({'zip_code': self.fake_zipcode})
+        error_message = "Invalid %s zip code format." % self.fake_zipcode
+
+        response = self.client.post(self.url, zip_code_json,
+                                    content_type="application/json")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(error_message, response.content)
+
+    def test_create_zipcode_not_found_in_postmon(self):
+        zip_code = '00000-123'
+        zip_code_json = json.dumps({'zip_code': zip_code})
+        error_message = "Zipcode %s not found in Postmon." % zip_code
+
+        response = self.client.post(self.url, zip_code_json,
+                                    content_type="application/json")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(error_message, response.content)

@@ -28,7 +28,7 @@ class ZipCodeResource(DjangoResource):
     })
 
     def is_debug(self):
-        return settings.DEBUG
+        return True
 
     def is_authenticated(self):
         try:
@@ -74,15 +74,15 @@ class ZipCodeResource(DjangoResource):
 
         try:
             zip_code_object = ZipCode.objects.create(**zip_code_data)
+
+            logger.info('[API CREATE] Zipcode created. zip_code=%s' % zip_code)
+
+            return zip_code_object
         except IntegrityError as e:
             error_code, error_message = e
             logger.error('[API CREATE] Error on create zipcode. zip_code=%s error=%s' % (zip_code, error_message))
 
-            raise BadRequest(error)
-
-        logger.info('[API CREATE] Zipcode created. zip_code=%s' % zip_code)
-
-        return zip_code_object
+            raise BadRequest(error_message)
 
     def detail(self, zip_code):
         logger.info('[API DETAIL] Get zipcode details. zip_code=%s' % zip_code)
