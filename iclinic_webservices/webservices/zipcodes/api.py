@@ -64,8 +64,7 @@ class ZipCodeResource(DjangoResource):
 
         return zip_code_object
 
-    def detail(self, pk):
-        zip_code = pk
+    def detail(self, zip_code):
 
         try:
             zip_code_object = ZipCode.objects.get(zip_code=zip_code)
@@ -74,8 +73,7 @@ class ZipCodeResource(DjangoResource):
 
         return zip_code_object
 
-    def delete(self, pk):
-        zip_code = pk
+    def delete(self, zip_code):
 
         try:
             zip_code_object = ZipCode.objects.get(zip_code=zip_code)
