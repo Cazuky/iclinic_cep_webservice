@@ -1,5 +1,6 @@
 from restless.dj import DjangoResource
 from restless.preparers import FieldsPreparer
+from django.conf import settings
 
 from iclinic_webservices.webservices.zipcodes.models import ZipCode
 from iclinic_webservices.webservices.apikeys.models import ApiKey
@@ -14,6 +15,9 @@ class ZipCodeResource(DjangoResource):
         'zip_code': 'zip_code',
         'neighborhood': 'neighborhood'
     })
+
+    def is_debug(self):
+        return settings.DEBUG
 
     def is_authenticated(self):
         try:
