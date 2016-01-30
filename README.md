@@ -14,6 +14,11 @@ $ mkvirtualenv iclinic_webservices
 $ pip install -r requirements/development.txt
 ```
 
+### Migrations
+```bash
+$ python manage.py migrate
+```
+
 ### Generate your API Key
 
 ```bash
@@ -23,7 +28,6 @@ API Key created: d41d8cd98f00b204e9800998ecf8427e
 
 ### Running Locally
 ```bash
-$ python manage.py migrate
 $ python manage.py runserver
 ```
 
