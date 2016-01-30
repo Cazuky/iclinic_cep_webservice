@@ -45,7 +45,7 @@ class ZipCodeResourceTestCase(TestCase):
 
         url = self.url_with_limit % {'limit': 1, 'api_key': self.api_key}
         response = self.client.get(url)
-        expected = '{"objects": [%s]}' % zip_codes[2].jsonify()
+        expected = '{"objects": [%s]}' % zip_codes[0].jsonify()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, expected)
