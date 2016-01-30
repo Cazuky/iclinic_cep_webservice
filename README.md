@@ -67,6 +67,32 @@ $ curl -i http://localhost:8000/zipcodes/?api_key=d41d8cd98f00b204e9800998ecf842
 }
 ```
 
+#### GET /zipcodes/?limit=XXX
+
+This endpoint lists all routes in the database limited by `limit` parameter.
+
+#### cURL Example
+
+```bash
+$ curl -i http://localhost:8000/zipcodes/?limit=1&api_key=d41d8cd98f00b204e9800998ecf8427e
+```
+
+#### Response Example
+```bash
+{
+    "objects": [
+        {
+            "city": "Araraquara",
+            "neighborhood": "Centro",
+            "state": "SP",
+            "address": "Rua Padre Duarte",
+            "id": 1,
+            "zip_code": "14800360"
+        },
+    ]
+}
+```
+
 #### GET `/zipcodes/<zip_code>`
 This endpoint returns the details of a zipcode.
 
